@@ -1,8 +1,6 @@
 package main
 
 import (
-	"fmt"
-	"html"
 	"log"
 	"net/http"
 	"github.com/gorilla/mux"
@@ -12,11 +10,9 @@ func main() {
 	
 	router := mux.NewRouter().StrictSlash(true)
 	
-	router.HandleFunc("/", Index)
+	apiCtrl := NewAPIController()
+	
+	router.HandleFunc("/", apiCtrl.Index).Methods("GET")
 	
 	log.Fatal(http.ListenAndServe(":4444", router))
-}
-
-func Index(w http.ResponseWriter, r *http.Request) {
-	 fmt.Fprintf(w, "Hello, %q", html.EscapeString(r.URL.Path))
 }
