@@ -14,7 +14,7 @@ type Route struct {
 	Name			string
 	Description		string		`sql:"size:1000"`
 	Responses		[]Response
-	Variables		[]Variable
+	Variables		[]Variable	`sql:"gorm:many2many:route_variables;"`
 }
 
 func NewRoute(controllerID int, name string, description string) *Route {

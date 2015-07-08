@@ -29,6 +29,10 @@ func (this *SQL) Init() bool {
 	db, err := gorm.Open(settings.SQLDriver, settings.SQLUsername + ":" + settings.SQLPassword + "@" + settings.SQLHostname + "/" + settings.SQLDatabase + "?charset=utf8&parseTime=True&loc=Local")
 	if err == nil {
 		this.DB = &db
+		this.DB.AutoMigrate(&Response{})
+		this.DB.AutoMigrate(&Variable{})
+		this.DB.AutoMigrate(&Controller{})
+		this.DB.AutoMigrate(&Route{})
 		return true
 	} else {
 		log.Fatal("Error while connecting to driver ", settings.SQLDriver, " ", err)

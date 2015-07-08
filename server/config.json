@@ -1,6 +1,6 @@
 {
 	"SQL_driver": "mysql",
-	"SQL_hostname": "localhost",
+	"SQL_hostname": "",
 	"SQL_username": "root",
 	"SQL_password": "",
 	"SQL_database": "doc",
