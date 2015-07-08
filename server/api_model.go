@@ -1,3 +1,7 @@
+//
+// @Author: Geoffrey Bauduin <bauduin.geo@gmail.com>
+//
+
 package main
 
 import (

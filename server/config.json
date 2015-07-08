@@ -1,0 +1,9 @@
+{
+	"SQL_driver": "mysql",
+	"SQL_hostname": "localhost",
+	"SQL_username": "root",
+	"SQL_password": "",
+	"SQL_database": "doc",
+	"SQL_table_prefix": "",
+	"port": 4444
+}

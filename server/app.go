@@ -1,18 +1,23 @@
+//
+// @Author: Geoffrey Bauduin <bauduin.geo@gmail.com>
+//
+
 package main
 
 import (
 	"log"
 	"net/http"
-	"github.com/gorilla/mux"
+	"strconv"
 )
 
 func main() {
-	
-	router := mux.NewRouter().StrictSlash(true)
-	
-	apiCtrl := NewAPIController()
-	
-	router.HandleFunc("/", apiCtrl.Index).Methods("GET")
-	
-	log.Fatal(http.ListenAndServe(":4444", router))
+	settings := NewSettings()
+	if settings == nil {
+		log.Fatal("Settings are nil")
+		return
+	}
+	router := NewRouter()
+	NewSQL()
+	log.Println("Server listening on port", settings.Port)
+	log.Fatal(http.ListenAndServe(":" + strconv.Itoa(settings.Port), router))
 }
