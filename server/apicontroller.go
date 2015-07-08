@@ -22,6 +22,5 @@ func (ctrl *APIController) Index (w http.ResponseWriter, r *http.Request) {
 	}{
 		*ctrl.Data,
 	}
-	fmt.Printf("%+v\n", data)
 	json.NewEncoder(w).Encode(data)
 }
