@@ -68,3 +68,27 @@ func (ctrl *ControllerController) Create (w http.ResponseWriter, r *http.Request
 		Answer(&controller, w, 200)	
 	}
 }
+
+func (ctrl *ControllerController) Update (w http.ResponseWriter, r *http.Request) {
+	data := ControllerCreateRequest{}
+	err := json.NewDecoder(r.Body).Decode(&data)
+	if err != nil {
+		Answer(&RequestError{"BadParams", nil}, w, 400)
+	} else {
+		vars := mux.Vars(r)
+		id := vars["id"]
+		controller := Controller{}
+		if ctrl.DB.DB.Where("ID = ?", id).Find(&controller).RecordNotFound() {
+			Answer(&RequestError{"NotFound", nil}, w, 404)
+		} else {
+			if data.Name != nil && len(*data.Name) > 0 {
+				controller.Name = *data.Name
+			}
+			if data.Description != nil {
+				controller.Description = *data.Description
+			}
+			ctrl.DB.DB.Save(&controller)
+			Answer(&ControllerSingleAnswer{controller}, w, 200)
+		}
+	}
+}

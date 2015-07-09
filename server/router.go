@@ -22,11 +22,15 @@ func Answer(data interface{}, w http.ResponseWriter, code int) {
 
 func NewRouter() *mux.Router {
 	router := mux.NewRouter().StrictSlash(true)
+
 	apiCtrl := NewAPIController()
-	controllerCtrl := NewControllerController()
 	router.HandleFunc("/", apiCtrl.Index).Methods("GET")
+	
+	controllerCtrl := NewControllerController()
 	router.HandleFunc("/controllers", controllerCtrl.GetAll).Methods("GET")
 	router.HandleFunc("/controllers/{id}", controllerCtrl.Get).Methods("GET")
 	router.HandleFunc("/controllers", controllerCtrl.Create).Methods("POST")
+	router.HandleFunc("/controllers/{id}", controllerCtrl.Update).Methods("PATCH")
+
 	return router
 }
