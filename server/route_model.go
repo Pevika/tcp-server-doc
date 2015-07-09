@@ -4,12 +4,8 @@
 
 package main
 
-import (
-	"github.com/jinzhu/gorm"
-)
-
 type Route struct {
-	gorm.Model
+	Model
 	ControllerID 	int			`sql:"index"`
 	Name			string
 	Description		string		`sql:"size:1000"`

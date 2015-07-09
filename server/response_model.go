@@ -4,12 +4,8 @@
 
 package main
 
-import (
-	"github.com/jinzhu/gorm"
-)
-
 type Response struct {
-	gorm.Model
+	Model
 	HTTPCode	int
 	Description	string		`sql:"size:1000"`
 	Variables	[]Variable	`sql:"gorm:many2many:response_variables;"`

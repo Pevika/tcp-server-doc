@@ -6,7 +6,6 @@ package main
 
 import (
 	"net/http"
-	"encoding/json"
 )
 
 type APIController struct {
@@ -25,5 +24,5 @@ func (ctrl *APIController) Index (w http.ResponseWriter, r *http.Request) {
 	}{
 		*ctrl.Data,
 	}
-	json.NewEncoder(w).Encode(data)
+	Answer(&data, w, 200)
 }

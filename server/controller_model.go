@@ -4,14 +4,11 @@
 
 package main
 
-import (
-	"github.com/jinzhu/gorm"
-)
-
 type Controller struct {
-	gorm.Model
-	Description		string
-	Routes 			[]Route
+	Model
+	Name 			string		`json:"name"`
+	Description		string		`json:"description"`
+	Routes 			[]Route		`json:"routes"`
 }
 
 func NewController(description string) *Controller {

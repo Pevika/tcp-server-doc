@@ -4,12 +4,8 @@
 
 package main
 
-import (
-	"github.com/jinzhu/gorm"
-)
-
 type Variable struct {
-	gorm.Model
+	Model
 	Name		string
 	Type		string
 	Description	string	`sql:"size:1000"`
