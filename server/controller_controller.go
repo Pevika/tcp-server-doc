@@ -65,7 +65,7 @@ func (ctrl *ControllerController) Create (w http.ResponseWriter, r *http.Request
 	} else {
 		controller := Controller{Name: *data.Name, Description: *data.Description}
 		ctrl.DB.DB.Create(&controller)
-		Answer(&controller, w, 200)	
+		Answer(&ControllerSingleAnswer{controller}, w, 200)	
 	}
 }
 
@@ -90,5 +90,16 @@ func (ctrl *ControllerController) Update (w http.ResponseWriter, r *http.Request
 			ctrl.DB.DB.Save(&controller)
 			Answer(&ControllerSingleAnswer{controller}, w, 200)
 		}
+	}
+}
+
+func (ctrl *ControllerController) Delete (w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	controller := Controller{}
+	if ctrl.DB.DB.Where("ID = ?", vars["id"]).Find(&controller).RecordNotFound() {
+		Answer(&RequestError{"NotFound", nil}, w, 404)
+	} else {
+		ctrl.DB.DB.Unscoped().Delete(&controller)
+		Answer(true, w, 200)
 	}
 }

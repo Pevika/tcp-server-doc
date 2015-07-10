@@ -31,6 +31,13 @@ func NewRouter() *mux.Router {
 	router.HandleFunc("/controllers/{id}", controllerCtrl.Get).Methods("GET")
 	router.HandleFunc("/controllers", controllerCtrl.Create).Methods("POST")
 	router.HandleFunc("/controllers/{id}", controllerCtrl.Update).Methods("PATCH")
+	router.HandleFunc("/controllers/{id}", controllerCtrl.Delete).Methods("DELETE")
+	
+	routeCtrl := NewRouteController()
+	router.HandleFunc("/routes/{id}", routeCtrl.Get).Methods("GET")
+	router.HandleFunc("/routes", routeCtrl.Create).Methods("POST")
+	router.HandleFunc("/routes/{id}", routeCtrl.Update).Methods("PATCH")
+	router.HandleFunc("/routes/{id}", routeCtrl.Delete).Methods("DELETE")
 
 	return router
 }
