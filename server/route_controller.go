@@ -26,6 +26,15 @@ type RouteCreateRequest struct {
 	Content			*string `json:"content"`
 }
 
+type RouteVariablesAnswer struct {
+	Variables 	[]Variable 	`json:"variables"`
+	RouteID		uint		`json:"routeID"`
+}
+
+type RouteLinkVariableRequest struct {
+	VariableID 	*uint	`json:"variableID"`	
+}
+
 func NewRouteController() *RouteController {
 	ctrl := new(RouteController)
 	ctrl.DB = NewSQL()
@@ -100,5 +109,63 @@ func (ctrl *RouteController) Delete (w http.ResponseWriter, r *http.Request) {
 	} else {
 		ctrl.DB.DB.Unscoped().Delete(&route)
 		Answer(true, w, 200)
+	}
+}
+
+func (ctrl *RouteController) GetVariables(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	route := Route{}
+	if ctrl.DB.DB.Where("ID = ?", vars["rid"]).Find(&route).RecordNotFound() {
+		Answer(&RequestError{"NotFound", "route"}, w, 404)
+	} else {
+		variables := RouteVariablesAnswer{[]Variable{}, route.ID}
+		ctrl.DB.DB.Model(&route).Related(&variables.Variables)
+		if variables.Variables == nil {
+			variables.Variables = []Variable{}
+		}
+		Answer(&variables, w, 200)
+	}
+}
+
+func (ctrl *RouteController) LinkVariable(w http.ResponseWriter, r *http.Request) {
+	data := RouteLinkVariableRequest{}
+	err := json.NewDecoder(r.Body).Decode(&data)
+	if err != nil {
+		Answer(&RequestError{"BadParams", nil}, w, 400)
+		log.Printf("%v\n", err)		
+	} else if data.VariableID == nil {
+		Answer(&RequestError{"BadParams", "variableID"}, w, 400)
+	} else {
+		vars := mux.Vars(r)
+		route := Route{}
+		variable := Variable{}
+		if ctrl.DB.DB.Where("ID = ?", vars["rid"]).Find(&route).RecordNotFound() {
+			Answer(&RequestError{"NotFound", "route"}, w, 404)
+		} else if ctrl.DB.DB.Where("ID = ?", *data.VariableID).Find(&variable).RecordNotFound() {
+			Answer(&RequestError{"NotFound", "variable"}, w, 404)
+		} else if variable.RouteID != 0 || variable.ResponseID != 0 {
+			Answer(&RequestError{"VariableAlreadyHasRoute", nil}, w, 400)
+		} else {
+			variable.RouteID = route.ID
+			ctrl.DB.DB.Save(&variable)
+			Answer(&SuccessAnswer{true, nil}, w, 200)	
+		}
+	}	
+}
+
+func (ctrl *RouteController) UnlinkVariable (w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	route := Route{}
+	variable := Variable{}
+	if ctrl.DB.DB.Where("ID = ?", vars["rid"]).Find(&route).RecordNotFound() {
+		Answer(&RequestError{"NotFound", "route"}, w, 404)
+	} else if ctrl.DB.DB.Where("ID = ?", vars["vid"]).Find(&variable).RecordNotFound() {
+		Answer(&RequestError{"NotFound", "variable"}, w, 404)
+	} else if variable.RouteID != route.ID {
+		Answer(&RequestError{"VariableIsNotInRoute", nil}, w, 400)
+	} else {
+		variable.RouteID = 0
+		ctrl.DB.DB.Save(&variable)
+		Answer(&SuccessAnswer{true, nil}, w, 200)	
 	}
 }

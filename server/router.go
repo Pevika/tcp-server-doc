@@ -44,5 +44,9 @@ func NewRouter() *mux.Router {
 	router.HandleFunc("/variables/{id}", variableCtrl.Update).Methods("PATCH")
 	router.HandleFunc("/variables/{id}", variableCtrl.Delete).Methods("DELETE")
 	
+	router.HandleFunc("/routes/{rid}/variables", routeCtrl.GetVariables).Methods("GET")
+	router.HandleFunc("/routes/{rid}/variables", routeCtrl.LinkVariable).Methods("POST")
+	router.HandleFunc("/routes/{rid}/variables/{vid}", routeCtrl.UnlinkVariable).Methods("DELETE")
+
 	return router
 }
