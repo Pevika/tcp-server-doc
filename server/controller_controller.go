@@ -27,6 +27,15 @@ type ControllerCreateRequest struct {
 	Description	*string	`json:"description"`
 }
 
+type ControllerRoutesAnswer struct {
+	Routes 			[]Route	`json:"routes"`
+	ControllerID 	uint	`json:"controllerID"`
+}
+
+type ControllerLinkRouteRequest struct {
+	RouteID 	*uint	`json:"routeID"`	
+}
+
 func NewControllerController() *ControllerController {
 	ctrl := new(ControllerController)
 	ctrl.DB = NewSQL()
@@ -100,6 +109,63 @@ func (ctrl *ControllerController) Delete (w http.ResponseWriter, r *http.Request
 		Answer(&RequestError{"NotFound", nil}, w, 404)
 	} else {
 		ctrl.DB.DB.Unscoped().Delete(&controller)
-		Answer(true, w, 200)
+		Answer(&SuccessAnswer{true, nil}, w, 200)
+	}
+}
+
+func (ctrl *ControllerController) GetRoutes (w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	controller := Controller{}
+	if ctrl.DB.DB.Where("ID = ?", vars["cid"]).Find(&controller).RecordNotFound() {
+		Answer(&RequestError{"NotFound", "controller"}, w, 404)
+	} else {
+		routes := ControllerRoutesAnswer{[]Route{}, controller.ID}
+		ctrl.DB.DB.Model(&controller).Related(&routes.Routes)
+		if routes.Routes == nil {
+			routes.Routes = []Route{}
+		}
+		Answer(&routes, w, 200)
+	}
+}
+
+func (ctrl *ControllerController) LinkRoute (w http.ResponseWriter, r *http.Request) {
+	data := ControllerLinkRouteRequest{}
+	err := json.NewDecoder(r.Body).Decode(&data)
+	if err != nil {
+		Answer(&RequestError{"BadParams", nil}, w, 400)
+	} else if data.RouteID == nil {
+		Answer(&RequestError{"BadParams", "routeID"}, w, 400)
+	} else {
+		vars := mux.Vars(r)
+		controller := Controller{}
+		route := Route{}
+		if ctrl.DB.DB.Where("ID = ?", vars["cid"]).Find(&controller).RecordNotFound() {
+			Answer(&RequestError{"NotFound", "controller"}, w, 404)
+		} else if ctrl.DB.DB.Where("ID = ?", *data.RouteID).Find(&route).RecordNotFound() {
+			Answer(&RequestError{"NotFound", "route"}, w, 404)
+		} else if route.ControllerID != 0 {
+			Answer(&RequestError{"RouteAlreadyHasController", nil}, w, 400)
+		} else {
+			route.ControllerID = controller.ID
+			ctrl.DB.DB.Save(&route)
+			Answer(&SuccessAnswer{true, nil}, w, 200)	
+		}
+	}
+}
+
+func (ctrl *ControllerController) UnlinkRoute (w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	controller := Controller{}
+	route := Route{}
+	if ctrl.DB.DB.Where("ID = ?", vars["cid"]).Find(&controller).RecordNotFound() {
+		Answer(&RequestError{"NotFound", "controller"}, w, 404)
+	} else if ctrl.DB.DB.Where("ID = ?", vars["rid"]).Find(&route).RecordNotFound() {
+		Answer(&RequestError{"NotFound", "route"}, w, 404)
+	} else if route.ControllerID != controller.ID {
+		Answer(&RequestError{"RouteIsNotInController", nil}, w, 400)
+	} else {
+		route.ControllerID = 0
+		ctrl.DB.DB.Save(&route)
+		Answer(&SuccessAnswer{true, nil}, w, 200)	
 	}
 }

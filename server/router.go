@@ -10,11 +10,6 @@ import (
 	"net/http"
 )
 
-type RequestError struct {
-	Error 	string		`json:"error"`
-	Data 	interface{}	`json:"data,omitempty"`
-}
-
 func Answer(data interface{}, w http.ResponseWriter, code int) {
 	w.WriteHeader(code)
 	json.NewEncoder(w).Encode(data)
@@ -38,6 +33,10 @@ func NewRouter() *mux.Router {
 	router.HandleFunc("/routes", routeCtrl.Create).Methods("POST")
 	router.HandleFunc("/routes/{id}", routeCtrl.Update).Methods("PATCH")
 	router.HandleFunc("/routes/{id}", routeCtrl.Delete).Methods("DELETE")
-
+	
+	router.HandleFunc("/controllers/{cid}/routes", controllerCtrl.GetRoutes).Methods("GET")
+	router.HandleFunc("/controllers/{cid}/routes", controllerCtrl.LinkRoute).Methods("POST")
+	router.HandleFunc("/controllers/{cid}/routes/{rid}", controllerCtrl.UnlinkRoute).Methods("DELETE")
+	
 	return router
 }
