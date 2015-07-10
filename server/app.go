@@ -6,8 +6,6 @@ package main
 
 import (
 	"log"
-	"net/http"
-	"strconv"
 )
 
 func main() {
@@ -16,8 +14,5 @@ func main() {
 		log.Fatal("Settings are nil")
 		return
 	}
-	router := NewRouter()
-	NewSQL()
-	log.Println("Server listening on port", settings.Port)
-	log.Fatal(http.ListenAndServe(":" + strconv.Itoa(settings.Port), router))
+	NewServer(settings)
 }
