@@ -6,9 +6,9 @@ package main
 
 type Variable struct {
 	Model
-	Name		string
-	Type		string
-	Description	string	`sql:"size:1000"`
+	Name		string	`json:"name"`
+	Type		string	`json:"type"`
+	Description	string	`sql:"size:1000" json:"description"`
 }
 
 func NewVariable(name string, type_ string, description string) *Variable {
