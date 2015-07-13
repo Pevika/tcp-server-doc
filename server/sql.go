@@ -33,6 +33,7 @@ func (this *SQL) Init() bool {
 		this.DB.AutoMigrate(&Variable{})
 		this.DB.AutoMigrate(&Controller{})
 		this.DB.AutoMigrate(&Route{})
+		this.DB.AutoMigrate(&Label{})
 		return true
 	} else {
 		log.Fatal("Error while connecting to driver ", settings.SQLDriver, " ", err)
