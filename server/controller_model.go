@@ -10,9 +10,3 @@ type Controller struct {
 	Description		string		`json:"description"`
 	Routes 			[]Route		`json:"routes,omitempty"`
 }
-
-func NewController(description string) *Controller {
-	controller := new(Controller)
-	controller.Description = description
-	return controller
-}

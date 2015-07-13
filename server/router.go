@@ -62,5 +62,15 @@ func NewRouter() *mux.Router {
 	router.HandleFunc("/responses/{rid}/variables", responseCtrl.LinkVariable).Methods("POST")
 	router.HandleFunc("/responses/{rid}/variables/{vid}", responseCtrl.UnlinkVariable).Methods("DELETE")
 
+	labelCtrl := NewLabelController()
+	router.HandleFunc("/labels", labelCtrl.GetAll).Methods("GET")
+	router.HandleFunc("/labels/{id}", labelCtrl.Get).Methods("GET")
+	router.HandleFunc("/labels", labelCtrl.Create).Methods("POST")
+	router.HandleFunc("/labels/{id}", labelCtrl.Update).Methods("PATCH")
+	router.HandleFunc("/labels/{id}", labelCtrl.Delete).Methods("DELETE")
+	
+	router.HandleFunc("/routes/{rid}/label", routeCtrl.SetLabel).Methods("POST")
+	router.HandleFunc("/routes/{rid}/label", routeCtrl.UnsetLabel).Methods("DELETE")
+
 	return router
 }

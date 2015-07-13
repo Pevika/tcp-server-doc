@@ -44,6 +44,10 @@ type RouteResponsesAnswer struct {
 	RouteID 	uint		`json:"routeID"`
 }
 
+type RouteSetLabelRequest struct {
+	LabelID 	*uint 	`json:"labelID"`
+}
+
 func NewRouteController() *RouteController {
 	ctrl := new(RouteController)
 	ctrl.DB = NewSQL()
@@ -233,5 +237,40 @@ func (ctrl *RouteController) UnlinkResponse (w http.ResponseWriter, r *http.Requ
 		response.RouteID = 0
 		ctrl.DB.DB.Save(&response)
 		Answer(&SuccessAnswer{true, nil}, w, 200)	
+	}
+}
+
+func (ctrl *RouteController) SetLabel (w http.ResponseWriter, r *http.Request) {
+	data := RouteSetLabelRequest{}
+	err := json.NewDecoder(r.Body).Decode(&data)
+	if err != nil {
+		Answer(&RequestError{"BadParams", nil}, w, 400)
+	} else if data.LabelID == nil {
+		Answer(&RequestError{"BadParams", "labelID"}, w, 400)
+	} else {
+		vars := mux.Vars(r)
+		route := Route{} 
+		label := Label{}
+		if ctrl.DB.DB.Where("ID = ?", vars["rid"]).Find(&route).RecordNotFound() {
+			Answer(&RequestError{"NotFound", "route"}, w, 404)
+		} else if ctrl.DB.DB.Where("ID = ?", *data.LabelID).Find(&label).RecordNotFound() {
+			Answer(&RequestError{"NotFound", "label"}, w, 404)
+		} else {
+			route.LabelID = label.ID
+			ctrl.DB.DB.Save(&route)
+			Answer(&SuccessAnswer{true, nil}, w, 200)
+		}
+	}
+}
+
+func (ctrl *RouteController) UnsetLabel (w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	route := Route{} 
+	if ctrl.DB.DB.Where("ID = ?", vars["rid"]).Find(&route).RecordNotFound() {
+		Answer(&RequestError{"NotFound", "route"}, w, 404)
+	} else {
+		route.LabelID = 0
+		ctrl.DB.DB.Save(&route)
+		Answer(&SuccessAnswer{true, nil}, w, 200)
 	}
 }

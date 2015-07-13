@@ -13,4 +13,5 @@ type Route struct {
 	Content 		string		`json:"content" sql:"size:1000"`
 	Responses		[]Response	`json:"responses,omitempty"`
 	Variables		[]Variable	`sql:"gorm:many2many:route_variables;" json:"variables,omitempty"`
+	LabelID			uint		`json:"labelID,omitempty"`
 }
