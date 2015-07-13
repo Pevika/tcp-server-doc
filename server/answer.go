@@ -5,7 +5,7 @@
 package main
 
 type SuccessAnswer struct {
-	Success 	bool		`json:"sucess"`
+	Success 	bool		`json:"success"`
 	Data 		interface{}	`json:"data,omitempty"`
 }
 

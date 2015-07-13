@@ -35,6 +35,15 @@ type RouteLinkVariableRequest struct {
 	VariableID 	*uint	`json:"variableID"`	
 }
 
+type RouteLinkResponseRequest struct {
+	ResponseID	*uint	`json:"responseID"`
+}
+
+type RouteResponsesAnswer struct {
+	Responses  	[]Response	`json:"responses"`
+	RouteID 	uint		`json:"routeID"`
+}
+
 func NewRouteController() *RouteController {
 	ctrl := new(RouteController)
 	ctrl.DB = NewSQL()
@@ -108,7 +117,7 @@ func (ctrl *RouteController) Delete (w http.ResponseWriter, r *http.Request) {
 		Answer(&RequestError{"NotFound", nil}, w, 404)
 	} else {
 		ctrl.DB.DB.Unscoped().Delete(&route)
-		Answer(true, w, 200)
+		Answer(&SuccessAnswer{true, nil}, w, 200)
 	}
 }
 
@@ -166,6 +175,63 @@ func (ctrl *RouteController) UnlinkVariable (w http.ResponseWriter, r *http.Requ
 	} else {
 		variable.RouteID = 0
 		ctrl.DB.DB.Save(&variable)
+		Answer(&SuccessAnswer{true, nil}, w, 200)	
+	}
+}
+
+func (ctrl *RouteController) GetResponses (w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	route := Route{}
+	if ctrl.DB.DB.Where("ID = ?", vars["roid"]).Find(&route).RecordNotFound() {
+		Answer(&RequestError{"NotFound", "route"}, w, 404)
+	} else {
+		responses := RouteResponsesAnswer{[]Response{}, route.ID}
+		ctrl.DB.DB.Model(&route).Related(&responses.Responses)
+		if responses.Responses == nil {
+			responses.Responses = []Response{}
+		}
+		Answer(&responses, w, 200)
+	}
+}
+
+func (ctrl *RouteController) LinkResponse (w http.ResponseWriter, r *http.Request) {
+	data := RouteLinkResponseRequest{}
+	err := json.NewDecoder(r.Body).Decode(&data)
+	if err != nil {
+		Answer(&RequestError{"BadParams", nil}, w, 400)
+	} else if data.ResponseID == nil {
+		Answer(&RequestError{"BadParams", "responseID"}, w, 400)
+	} else {
+		vars := mux.Vars(r)
+		route := Route{} 
+		response := Response{}
+		if ctrl.DB.DB.Where("ID = ?", vars["roid"]).Find(&route).RecordNotFound() {
+			Answer(&RequestError{"NotFound", "route"}, w, 404)
+		} else if ctrl.DB.DB.Where("ID = ?", *data.ResponseID).Find(&response).RecordNotFound() {
+			Answer(&RequestError{"NotFound", "response"}, w, 404)
+		} else if response.RouteID != 0 {
+			Answer(&RequestError{"ResponseAlreadyHasRoute", nil}, w, 400)
+		} else {
+			response.RouteID = route.ID
+			ctrl.DB.DB.Save(&response)
+			Answer(&SuccessAnswer{true, nil}, w, 200)
+		}
+	}
+}
+
+func (ctrl *RouteController) UnlinkResponse (w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	route := Route{}
+	response := Response{}
+	if ctrl.DB.DB.Where("ID = ?", vars["roid"]).Find(&route).RecordNotFound() {
+			Answer(&RequestError{"NotFound", "route"}, w, 404)
+	} else if ctrl.DB.DB.Where("ID = ?", vars["reid"]).Find(&response).RecordNotFound() {
+		Answer(&RequestError{"NotFound", "response"}, w, 404)
+	} else if response.RouteID != route.ID {
+		Answer(&RequestError{"ResponseIsNotInRoute", nil}, w, 400)
+	} else {
+		response.RouteID = 0
+		ctrl.DB.DB.Save(&response)
 		Answer(&SuccessAnswer{true, nil}, w, 200)	
 	}
 }

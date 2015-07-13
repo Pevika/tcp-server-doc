@@ -48,5 +48,19 @@ func NewRouter() *mux.Router {
 	router.HandleFunc("/routes/{rid}/variables", routeCtrl.LinkVariable).Methods("POST")
 	router.HandleFunc("/routes/{rid}/variables/{vid}", routeCtrl.UnlinkVariable).Methods("DELETE")
 
+	responseCtrl := NewResponseController()
+	router.HandleFunc("/responses/{id}", responseCtrl.Get).Methods("GET")
+	router.HandleFunc("/responses", responseCtrl.Create).Methods("POST")
+	router.HandleFunc("/responses/{id}", responseCtrl.Update).Methods("PATCH")
+	router.HandleFunc("/responses/{id}", responseCtrl.Delete).Methods("DELETE")
+	
+	router.HandleFunc("/routes/{roid}/responses", routeCtrl.GetResponses).Methods("GET")
+	router.HandleFunc("/routes/{roid}/responses", routeCtrl.LinkResponse).Methods("POST")
+	router.HandleFunc("/routes/{roid}/responses/{reid}", routeCtrl.UnlinkResponse).Methods("DELETE")
+	
+	router.HandleFunc("/responses/{rid}/variables", responseCtrl.GetVariables).Methods("GET")
+	router.HandleFunc("/responses/{rid}/variables", responseCtrl.LinkVariable).Methods("POST")
+	router.HandleFunc("/responses/{rid}/variables/{vid}", responseCtrl.UnlinkVariable).Methods("DELETE")
+
 	return router
 }

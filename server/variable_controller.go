@@ -92,6 +92,6 @@ func (ctrl *VariableController) Delete (w http.ResponseWriter, r *http.Request) 
 		Answer(&RequestError{"NotFound", nil}, w, 404)
 	} else {
 		ctrl.DB.DB.Unscoped().Delete(&variable)
-		Answer(true, w, 200)
+		Answer(&SuccessAnswer{true, nil}, w, 200)
 	}
 }
