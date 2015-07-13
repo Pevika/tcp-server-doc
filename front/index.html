@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html ng-app="app">
+<head>
+	<link rel="stylesheet" type="text/css" href="css/fonts.css">
+	<link rel="stylesheet" type="text/css" href="css/global.css">
+	<link rel="stylesheet" type="text/css" href="css/font-awesome-4.2.0/css/font-awesome.css">
+	<meta charset='utf-8' />
+	<title>Protocole Serveur / Applications Mobiles</title>
+	<link rel="shortcut icon" href="css/images/citywarfare.ico" type="image/x-icon" />
+</head>
+<body>
+	<div id='page-wrapper'>
+		<div id='page-content'>
+			<h1>Protocole de communication<br/>Serveur de jeu <i class="fa fa-arrows-h"></i> applications mobiles </h1>
+			<div ng-controller="ControllerCtrl" ng-init="init()">
+				<div ng-repeat="controller in controllers" class="section-wrapper">
+					<h2 class="section-title hidable-content-title">{{ controller.name }} </h2>
+					<div class="section-content hidable-content">
+						<p>
+							{{ controller.description }}
+						</p>
+						<div class="section-wrapper subsection-wrapper" ng-repeat="route in controller.routes">
+							<h2 class="section-title hidable-content-title">{{ route.name }}</h2>
+							<div class="section-content hidable-content" hidden="" style="display: block;">
+								<p>
+									{{ route.description }}
+								</p>
+								<h3 class="section-subtitle">Requête de l’application</h3>
+								<div class="request-wrapper">
+									<div class="request-title"></div>
+									<div class="request-json-wrapper">
+										<div class="request-json">
+											<div class="request-direction">
+												<span class="request-direction-label">Direction:</span> application &gt; serveur
+											</div>
+											<pre class="json-wrapper" ng-bind-html="route.formatedContent"></pre>
+										</div>
+										<div class="request-legend-wrapper">
+											<table class="request-legend">
+												<tbody>
+													<tr>
+														<th>Argument</th>
+														<th>Type</th>
+														<th>Description</th>
+													</tr>
+													<tr ng-repeat="variable in route.variables">
+														<td>{{ variable.name }}</td>
+														<td>{{ variable.type }}</td>
+														<td>{{ variable.description }}</td>
+													</tr>
+													<tr ng-hide="route.variables.length">
+														<td colspan="3" style="text-align:center;">Pas de variables</td>
+													</tr>
+												</tbody>
+											</table>
+										</div>
+									</div>
+								</div>
+								<h3 class="section-subtitle">Réponse du serveur</h3>
+								<div class="request-wrapper" ng-repeat="response in route.responses">
+									<div class="request-title">{{ response.description }}</div>
+									<div class="request-json-wrapper">
+										<div class="request-json">
+											<div class="request-direction"><span class="request-direction-label">Direction:</span> serveur &gt; application
+										</div>
+										<pre class="json-wrapper" ng-bind-html="response.formatedContent"></pre>
+									</div>
+									<div class="request-legend-wrapper">
+										<table class="request-legend">
+											<tbody>
+												<tr>
+													<th>Argument</th>
+													<th>Type</th>
+													<th>Description</th>
+												</tr>
+												<tr ng-repeat="variable in response.variables">
+												<td>{{ variable.name }}</td>
+												<td>{{ variable.type }}</td>
+												<td>{{ variable.description }}</td>
+												</tr>
+												<tr ng-hide="response.variables.length">
+													<td colspan="3" style="text-align:center;">Pas de variables</td>
+												</tr>
+											</tbody>
+										</table>
+									</div>
+								</div>
+							</div>
+							<div class="section-buttons hidable-content-buttons hidden"></div>
+						</div>
+					</div>
+					<div class="section-buttons hidable-content-buttons shown"></div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<script src="js/angular.min.js" type="text/javascript"></script>
+	<script src="app/app.js" type="text/javascript"></script>
+	<script src="app/controllers/ControllerCtrl.js" type="text/javascript"></script>
+	<script src="app/factories/ControllerFactory.js" type="text/javascript"></script>
+	<script src="app/factories/ResponseFactory.js" type="text/javascript"></script>
+	<script src="app/factories/RouteFactory.js" type="text/javascript"></script>
+	<script src="app/factories/VariableFactory.js" type="text/javascript"></script>
+	<script src="app/helpers/HttpRequest.js" type="text/javascript"></script>
+	<script src="app/helpers/QueryStatus.js" type="text/javascript"></script>
+	<script src="app/models/Controller.js" type="text/javascript"></script>
+	<script src="app/models/Response.js" type="text/javascript"></script>
+	<script src="app/models/Route.js" type="text/javascript"></script>
+	<script src="app/models/Variable.js" type="text/javascript"></script>
+	<script src="app/services/ControllerService.js" type="text/javascript"></script>
+	<script src="app/services/ResponseService.js" type="text/javascript"></script>
+	<script src="app/services/RouteService.js" type="text/javascript"></script>
+	<script src="app/services/VariableService.js" type="text/javascript"></script>
+</body>
+</html>
