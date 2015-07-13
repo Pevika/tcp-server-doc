@@ -8,5 +8,4 @@ type Controller struct {
 	Model
 	Name 			string		`json:"name"`
 	Description		string		`json:"description"`
-	Routes 			[]Route		`json:"routes,omitempty"`
 }
