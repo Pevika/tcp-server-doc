@@ -8,4 +8,22 @@ angular.module("app").service("ControllerService", ['HttpRequest', function (Htt
 		return HttpRequest.get("/controllers");
 	}
 	
+	this.create = function (name, description) {
+		return HttpRequest.post("/controllers", {
+			name: name,
+			description: description
+		});
+	}
+	
+	this.update = function (controller, name, description) {
+		return HttpRequest.patch("/controllers/" + controller.id, {
+			name: name,
+			description: description
+		})
+	}
+	
+	this.delete = function (controller) {
+		return HttpRequest.delete("/controllers/" + controller.id);
+	}
+	
 }]);

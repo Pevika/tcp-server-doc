@@ -24,8 +24,27 @@ angular.module("app").factory("ControllerFactory", ['ControllerService', '$windo
 			});
 		}
 		
-		this.loadRoutes = function (id) {
-			
+		this.create = function (name, description) {
+			var _this = this;
+			return ControllerService.create(name, description).then(function (query) {
+				if (query.success) {
+					query.data = _this.new(query.data.controller);
+				}
+				return query;
+			});
+		}
+		
+		this.update = function (controller, name, description) {
+			return ControllerService.update(controller, name, description).then(function (query) {
+				if (query.success) {
+					controller.hydrate(query.data.controller);					
+				}
+				return query;
+			})
+		}
+		
+		this.delete = function (controller) {
+			return ControllerService.delete(controller);
 		}
 	
 		return this;

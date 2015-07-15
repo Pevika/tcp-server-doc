@@ -66,6 +66,21 @@ angular.module("app").factory("HttpRequest", ['$http', 'QueryStatus',
 				return query;
 			})
 		}
+		
+		this.patch = function (url, data) {
+			return $http({
+				method: "PATCH",
+				url: API_URL + url,
+				headers: {
+					'Content-Type': "application/json"
+				},
+				data: data
+			}).then(function (result) {
+				return new QueryStatus(result, true);
+			}, function (result) {
+				return new QueryStatus(result, false);
+			})
+		}
 
 		return this;
 

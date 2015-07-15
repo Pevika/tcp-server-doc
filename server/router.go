@@ -8,6 +8,7 @@ import (
 	"github.com/gorilla/mux"
 	"encoding/json"
 	"net/http"
+	"log"
 )
 
 func Answer(data interface{}, w http.ResponseWriter, code int) {
@@ -19,8 +20,14 @@ func HandleRequest (fn http.HandlerFunc) http.HandlerFunc {
 	return func (w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Access-Control-Allow-Origin", r.Header.Get("Origin"))
 		w.Header().Set("Access-Control-Allow-Methods", "POST, GET, PATCH, DELETE, OPTIONS")
+		w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
 		fn(w, r)
 	}
+}
+
+func options (w http.ResponseWriter, r *http.Request) {
+	log.Println("Request OPTIONS")
+	w.Write([]byte(""))
 }
 
 func NewRouter() *mux.Router {
@@ -33,7 +40,9 @@ func NewRouter() *mux.Router {
 	router.HandleFunc("/controllers", HandleRequest(controllerCtrl.GetAll)).Methods("GET")
 	router.HandleFunc("/controllers/{id}", HandleRequest(controllerCtrl.Get)).Methods("GET")
 	router.HandleFunc("/controllers", HandleRequest(controllerCtrl.Create)).Methods("POST")
+	router.HandleFunc("/controllers", HandleRequest(options)).Methods("OPTIONS")
 	router.HandleFunc("/controllers/{id}", HandleRequest(controllerCtrl.Update)).Methods("PATCH")
+	router.HandleFunc("/controllers/{id}", HandleRequest(options)).Methods("OPTIONS")
 	router.HandleFunc("/controllers/{id}", HandleRequest(controllerCtrl.Delete)).Methods("DELETE")
 	
 	routeCtrl := NewRouteController()

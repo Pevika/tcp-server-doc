@@ -2,8 +2,8 @@
  * @Author: Geoffrey Bauduin <bauduin.geo@gmail.com>
  */
 
-angular.module("app").controller("ControllerCtrl", ['ControllerFactory', '$scope', 'RouteFactory', '$sce', 'VariableFactory', 'ResponseFactory',
-	function (ControllerFactory, $scope, RouteFactory, $sce, VariableFactory, ResponseFactory) {
+angular.module("app").controller("ControllerCtrl", ['ControllerFactory', '$scope', 'RouteFactory', '$sce', 'VariableFactory', 'ResponseFactory', 'Dialog',
+	function (ControllerFactory, $scope, RouteFactory, $sce, VariableFactory, ResponseFactory, Dialog) {
 
 		$scope.controllers = [];
 
@@ -92,6 +92,63 @@ angular.module("app").controller("ControllerCtrl", ['ControllerFactory', '$scope
 				content = content.replace(new RegExp(" "  + args[i].name, 'g'), " <span class='parameter'>" + args[i].name + "</span>");
 			}
 			return content;
+		}
+		
+		$scope.model = {
+			controller: {
+				name: "",
+				description: ""
+			}
+		}
+		
+		$scope.showNewController = function () {
+			$scope.s_newController = $scope.s_newController ? false : true;
+		}
+		
+		$scope.newController = function () {
+			ControllerFactory.create($scope.model.controller.name, $scope.model.controller.description).then(function (query) {
+				if (query.success) {
+					$scope.controllers.push(query.data);
+					$scope.showNewController();
+					$scope.model.controller.name = "";
+					$scope.model.controller.description = "";
+				}
+				else {
+					// TODO: error handler
+				}
+			});
+		}
+		
+		$scope.editController = function (controller) {
+			controller.edit = controller.edit ? false : true;
+			controller.model = {
+				name: controller.name,
+				description: controller.description
+			}
+		}
+		
+		$scope.saveController = function (controller) {
+			ControllerFactory.update(controller, controller.model.name, controller.model.description).then(function (query) {
+				if (query.success) {
+					$scope.editController(controller);
+				}
+				else {
+					// TODO: error handler
+				}
+			})
+		}
+		
+		$scope.deleteController = function (controller) {
+			Dialog.confirm("Supprimer le contrôleur '" + controller.name + "' ?").then(function () {
+				ControllerFactory.delete(controller).then(function (query) {
+					if (query.success) {
+						$scope.controllers.splice($scope.controllers.indexOf(controller), 1);
+					}
+					else {
+						// TODO: error handler
+					}
+				})
+			});
 		}
 	
 	}]);
