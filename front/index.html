@@ -88,9 +88,9 @@
 													<th>Description</th>
 												</tr>
 												<tr ng-repeat="variable in response.variables">
-												<td>{{ variable.name }}</td>
-												<td>{{ variable.type }}</td>
-												<td>{{ variable.description }}</td>
+													<td>{{ variable.name }}</td>
+													<td>{{ variable.type }}</td>
+													<td>{{ variable.description }}</td>
 												</tr>
 												<tr ng-hide="response.variables.length">
 													<td colspan="3" style="text-align:center;">Pas de variables</td>
@@ -102,6 +102,40 @@
 							</div>
 						</div>
 						<div class="section-buttons hidable-content-buttons" ng-class="{'shown':route.display,'hidden':!route.display}"></div>
+					</div>
+					<div class="section-wrapper subsection-wrapper">
+						<h2 class="section-title hidable-content-title" ng-click="showNewRoute(controller)">Ajouter une route</h2>
+						<div class="section-content hidable-content" ng-show="controller.newRoute">
+							<form>
+								<fieldset>
+									<label>Nom</label>
+									<input type="text" ng-model="controller.routeModel.name" />
+									<label>Description</label>
+									<textarea ng-model="controller.routeModel.description"></textarea><br>
+									<label>Contenu</label>
+									<textarea ng-model="controller.routeModel.content"></textarea><br>
+									<table>
+										<tbody>
+											<tr>
+												<th>Argument</th>
+												<th>Type</th>
+												<th colspan="2">Description</th>
+											</tr>
+											<tr ng-repeat="variable in controller.routeModel.variables">
+												<td><input type="text" ng-model="variable.name" /></td>
+												<td><input type="text" ng-model="variable.type" /></td>
+												<td><input type="text" ng-model="variable.description" /></td>
+												<td><button class="btn btn-danger" ng-click="deleteVariable(controller.routeModel, variable)">Supprimer</button></td>
+											</tr>
+											<tr>
+												<td colspan="4" ng-click="addVariable(controller.routeModel)">Ajouter</td>
+											</tr>
+										</tbody>
+									</table>
+									<button class="btn btn-success" ng-click="createRoute(controller)">Créer</button>
+								</fieldset>
+							</form>
+						</div>
 					</div>
 				</div>
 				<div class="section-buttons hidable-content-buttons" ng-class="{'shown':controller.display,'hidden':!controller.display}"></div>

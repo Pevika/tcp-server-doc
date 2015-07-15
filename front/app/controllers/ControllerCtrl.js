@@ -2,8 +2,8 @@
  * @Author: Geoffrey Bauduin <bauduin.geo@gmail.com>
  */
 
-angular.module("app").controller("ControllerCtrl", ['ControllerFactory', '$scope', 'RouteFactory', '$sce', 'VariableFactory', 'ResponseFactory', 'Dialog',
-	function (ControllerFactory, $scope, RouteFactory, $sce, VariableFactory, ResponseFactory, Dialog) {
+angular.module("app").controller("ControllerCtrl", ['ControllerFactory', '$scope', 'RouteFactory', '$sce', 'VariableFactory', 'ResponseFactory', 'Dialog', '$q',
+	function (ControllerFactory, $scope, RouteFactory, $sce, VariableFactory, ResponseFactory, Dialog, $q) {
 
 		$scope.controllers = [];
 
@@ -148,6 +148,74 @@ angular.module("app").controller("ControllerCtrl", ['ControllerFactory', '$scope
 						// TODO: error handler
 					}
 				})
+			});
+		}
+		
+		$scope.showNewRoute = function (controller) {
+			controller.newRoute = controller.newRoute ? false : true;
+			controller.routeModel = {
+				name: "",
+				description: "",
+				content: "",
+				variables: []
+			}
+		}
+		
+		$scope.createRoute = function (controller) {
+			var content = JSON.stringify(JSON.parse(controller.routeModel.content));
+			RouteFactory.create(controller.routeModel.name, controller.routeModel.description, content).then(function (query) {
+				if (query.success) {
+					ControllerFactory.linkRoute(controller, query.data).then(function (q) {
+						if (q.success) {
+							var route = query.data;
+							var promises = [];
+							for (var i = 0 ; i < controller.routeModel.variables.length ; ++i) {
+								var deferred = $q.defer();
+								promises.push(deferred.promise);
+								VariableFactory.create(
+									controller.routeModel.variables[i].name,
+									controller.routeModel.variables[i].type,
+									controller.routeModel.variables[i].description									
+								).then(function (query) {
+									if (query.success) {
+										RouteFactory.linkVariable(route, query.data).then(function (query) {
+											if (query.success) {
+												deferred.resolve();
+											}
+											else {
+												deferred.reject();
+											}
+										})
+									}
+								})
+							}
+							$q.all(promises).then(function () {
+								route.formatedContent = $sce.trustAsHtml($scope.formatJSON(route.content, route.variables));
+								$scope.showNewRoute(controller);										
+							})
+						}
+						else {
+							// TODO: error handler
+						}
+					});
+				}
+				else {
+					// TODO: error handler
+				}
+			});
+		}
+		
+		$scope.addVariable = function (model) {
+			model.variables.push({
+				name: "",
+				type: "",
+				description: ""
+			})
+		}
+		
+		$scope.deleteVariable = function (model, variable) {
+			Dialog.confirm("Supprimer la variable '" + variable.name + "' ?").then(function () {
+				model.variables.splice(model.variables.indexOf(variable), 1);
 			});
 		}
 	

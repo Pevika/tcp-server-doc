@@ -36,6 +36,16 @@ angular.module("app").factory("VariableFactory", ['VariableService', '$window', 
 		});
 	}
 	
+	this.create = function (name, type, description) {
+		var _this = this;
+		return VariableService.create(name, type, description).then(function (query) {
+			if (query.success) {
+				query.data = _this.new(query.data.variable);
+			}
+			return query;
+		})
+	}
+	
 	return this;
 	
 }]);

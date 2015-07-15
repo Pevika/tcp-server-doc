@@ -46,6 +46,18 @@ angular.module("app").factory("ControllerFactory", ['ControllerService', '$windo
 		this.delete = function (controller) {
 			return ControllerService.delete(controller);
 		}
+		
+		this.linkRoute = function (controller, route) {
+			return ControllerService.linkRoute(controller, route).then(function (query) {
+				if (query.success) {
+					if (!controller.routes) {
+						controller.routes = [];
+					}
+					controller.routes.push(route);
+				}
+				return query;
+			})
+		}
 	
 		return this;
 	

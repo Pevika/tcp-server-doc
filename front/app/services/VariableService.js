@@ -12,4 +12,12 @@
 		 return HttpRequest.get("/responses/" + responseID + "/variables");
 	 }
 	 
+	 this.create = function (name, type, description) {
+		 return HttpRequest.post("/variables", {
+			 name: name,
+			 type: type,
+			 description: description
+		 })
+	 }
+	 
  }]);

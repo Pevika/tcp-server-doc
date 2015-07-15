@@ -26,4 +26,10 @@ angular.module("app").service("ControllerService", ['HttpRequest', function (Htt
 		return HttpRequest.delete("/controllers/" + controller.id);
 	}
 	
+	this.linkRoute = function (controller, route) {
+		return HttpRequest.post("/controllers/" + controller.id + "/routes", {
+			routeID: route.id
+		});
+	}
+	
 }]);
