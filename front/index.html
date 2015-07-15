@@ -14,14 +14,14 @@
 			<h1>Protocole de communication<br/>Serveur de jeu <i class="fa fa-arrows-h"></i> applications mobiles </h1>
 			<div ng-controller="ControllerCtrl" ng-init="init()">
 				<div ng-repeat="controller in controllers" class="section-wrapper">
-					<h2 class="section-title hidable-content-title">{{ controller.name }} </h2>
-					<div class="section-content hidable-content">
+					<h2 class="section-title hidable-content-title" ng-click="showController(controller)">{{ controller.name }} </h2>
+					<div class="section-content hidable-content" ng-show="controller.display">
 						<p>
 							{{ controller.description }}
 						</p>
 						<div class="section-wrapper subsection-wrapper" ng-repeat="route in controller.routes">
-							<h2 class="section-title hidable-content-title">{{ route.name }}</h2>
-							<div class="section-content hidable-content" hidden="" style="display: block;">
+							<h2 class="section-title hidable-content-title" ng-click="showRoute(route)">{{ route.name }}</h2>
+							<div class="section-content hidable-content" ng-show="route.display">
 								<p>
 									{{ route.description }}
 								</p>
@@ -86,11 +86,11 @@
 									</div>
 								</div>
 							</div>
-							<div class="section-buttons hidable-content-buttons hidden"></div>
 						</div>
+						<div class="section-buttons hidable-content-buttons" ng-class="{'shown':route.display,'hidden':!route.display}"></div>
 					</div>
-					<div class="section-buttons hidable-content-buttons shown"></div>
 				</div>
+				<div class="section-buttons hidable-content-buttons" ng-class="{'shown':controller.display,'hidden':!controller.display}"></div>
 			</div>
 		</div>
 	</div>

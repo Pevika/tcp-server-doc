@@ -21,12 +21,20 @@ angular.module("app").controller("ControllerCtrl", ['ControllerFactory', '$scope
 			});
 		}
 		
+		$scope.showController = function (controller) {
+			controller.display = controller.display ? false : true;
+		}
+
+		$scope.showRoute = function (route) {
+			route.display = route.display ? false : true;
+		}
+		
+		
 		$scope.loadRoutes = function (controller) {
 			RouteFactory.all(controller.id).then(function (query) {
 				if (query.success) {
 					controller.routes = query.data;
 					for (var i = 0 ; i < controller.routes.length ; ++i) {
-						controller.routes[i].formatedContent = $sce.trustAsHtml($scope.formatJSON(controller.routes[i].content));
 						$scope.loadRouteVariables(controller.routes[i]);
 						$scope.loadResponses(controller.routes[i]);
 					}
@@ -42,6 +50,7 @@ angular.module("app").controller("ControllerCtrl", ['ControllerFactory', '$scope
 			VariableFactory.allOfRoute(route.id).then(function (query) {
 				if (query.success) {
 					route.variables = query.data;
+					route.formatedContent = $sce.trustAsHtml($scope.formatJSON(route.content, route.variables));
 				}
 			})
 		}
@@ -51,7 +60,6 @@ angular.module("app").controller("ControllerCtrl", ['ControllerFactory', '$scope
 				if (query.success) {
 					route.responses = query.data;
 					for (var i = 0 ; i < route.responses.length ; ++i) {
-						route.responses[i].formatedContent = $sce.trustAsHtml($scope.formatJSON(route.responses[i].content));
 						$scope.loadResponseVariables(route.responses[i]);
 					}
 				}	
@@ -62,11 +70,12 @@ angular.module("app").controller("ControllerCtrl", ['ControllerFactory', '$scope
 			VariableFactory.allOfResponse(response.id).then(function (query) {
 				if (query.success) {
 					response.variables = query.data;
+					response.formatedContent = $sce.trustAsHtml($scope.formatJSON(response.content, response.variables));
 				}
 			});
 		}
 		
-		$scope.formatJSON = function (content) {
+		$scope.formatJSON = function (content, args) {
 			content = content.replace(/\t/g, "   ")
 							.replace(/\{/g, "<span class='json-syntax-token'>{</span>")
 							.replace(/\}/g, "<span class='json-syntax-token'>}</span>")
@@ -78,7 +87,11 @@ angular.module("app").controller("ControllerCtrl", ['ControllerFactory', '$scope
 			for (var i = 0 ; i < tmp.length ; ++i) {
 				tmp[i] = "<span class='json-line'>" + tmp[i] + "</span>\n";
 			}
-			return tmp.join("");
+			content = tmp.join("");
+			for (var i = 0 ; args && i < args.length ; ++i) {
+				content = content.replace(new RegExp(" "  + args[i].name, 'g'), " <span class='parameter'>" + args[i].name + "</span>");
+			}
+			return content;
 		}
 	
 	}]);
